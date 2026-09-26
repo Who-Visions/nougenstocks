@@ -25,10 +25,7 @@ This codebase carries forward risk settings documented in `Who-Visions/unk-app-a
    - **Grade C**: 50% calculated size (0.50x).
    - **Grade D**: 25% calculated size (0.25x).
    - **Circuit Breakers**: Daily max loss limit (-5% of account) & consecutive loss limit (3 losses = done for the day).
-3. **Illustrative prototype scoring** (not Unk's upstream scoring algorithm):
-   - **Technicals**: RSI(14) oversold/overbought, MACD cross, Bollinger squeeze, moving average trend.
-   - **Fundamentals**: P/E ratio (<15), Revenue Growth (>20%), ROE (>20%), Debt/Equity (<0.5).
-   - **Signals**: `STRONG BUY` (>=5), `BUY` (2..4), `HOLD` (-1..1), `SELL` (-4..-2), `STRONG SELL` (<=-5).
+3. **Illustrative prototype scoring** (not Unk's upstream scoring algorithm): any experimental score or grade must remain explicitly labeled as a prototype and use sample inputs until a documented source and validated data feed exist.
 
 ### 📊 Macroeconomic & ETF Context (NouGenTube Shard 29195)
 Captures topics discussed in Professor G's market dispatch (*"Stock Market is Set to Do the UNTHINKABLE"*). Shard content is third-party speech, not verified or current market data:
