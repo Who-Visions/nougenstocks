@@ -1,4 +1,4 @@
-import { Calculator, CheckCircle2, Flame, LineChart, Shield, Zap } from 'lucide-react'
+import { Calculator, CheckCircle2, Flame, LineChart, Shield } from 'lucide-react'
 import { type Stock } from './data'
 
 interface StockDetailModalProps {
@@ -17,23 +17,23 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
           <div className="detail-title-block">
             <span className={`ticker-icon ${stock.symbol.toLowerCase()}`}>{stock.symbol.slice(0, 1)}</span>
             <div>
-              <div className="detail-kicker">{stock.sector} · {stock.bestHorizon} Preferred</div>
+              <div className="detail-kicker">SAMPLE DATA · {stock.sector}</div>
               <h2 id="stock-detail-title">{stock.symbol} <span className="detail-name">{stock.name}</span></h2>
             </div>
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Close modal">×</button>
         </header>
 
-        {/* Unk Street-Smart Commentary Banner */}
+        {/* Sample score is a local prototype, not an upstream Unk signal. */}
         <div className="detail-unk-card">
           <div className="unk-card-header">
-            <span className="unk-badge"><Zap size={13}/> UNK DISPATCH</span>
+            <span className="unk-badge">PROTOTYPE SCORE · NOT LIVE</span>
             <span className={`signal-badge ${stock.unkSignal.toLowerCase().replace(' ', '-')}`}>
               {stock.unkSignal === 'STRONG BUY' && <Flame size={12}/>}
               {stock.unkSignal} (Score: {stock.unkScore > 0 ? `+${stock.unkScore}` : stock.unkScore})
             </span>
           </div>
-          <p className="unk-quote-text">"{stock.unkCommentary}"</p>
+          <p className="unk-quote-text">{stock.unkCommentary}</p>
         </div>
 
         <div className="detail-body-grid">
@@ -98,7 +98,7 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
         <div className="detail-foot">
           <div className="setup-hint">
             <CheckCircle2 size={14} className="positive"/>
-            <span>Quality: <b>{stock.setupQuality}-Grade</b> · Recommended: <b>{stock.bestHorizon}</b></span>
+            <span>Illustrative grade: <b>{stock.setupQuality}</b> · Horizon: <b>{stock.bestHorizon}</b></span>
           </div>
           <button
             className="primary-button"

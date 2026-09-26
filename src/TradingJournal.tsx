@@ -50,9 +50,9 @@ export function TradingJournal({
     <div className="journal-container" id="journal">
       <div className="journal-head">
         <div>
-          <div className="section-kicker">ROSS CAMERON CUSHION &amp; DISCIPLINE PROTOCOL</div>
+          <div className="section-kicker">LOCAL PAPER TRADING · DEMO GUARDRAILS</div>
           <h2>Paper Trading Journal &amp; Cushion Status</h2>
-          <p>Track your trade executions, realized PnL cushion, and automatic risk breakers.</p>
+          <p>Track trades you enter here. Demo guardrails are configurable examples, not attributed to Unk.</p>
         </div>
         {trades.length > 0 && (
           <button className="text-button" onClick={onClearJournal}>
@@ -84,7 +84,7 @@ export function TradingJournal({
         <div className="cushion-card">
           <small>CUSHION SIZING MODE</small>
           <strong className="cushion-mode">{status.mode} ({status.multiplier * 100}%)</strong>
-          <span>Based on profit reserve</span>
+            <span>Demo cushion model</span>
         </div>
         <div className="cushion-card">
           <small>WIN RATE</small>

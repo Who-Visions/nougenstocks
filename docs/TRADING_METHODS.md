@@ -1,6 +1,6 @@
 # Trading methods and provenance
 
-NouGenStocks carries forward the risk framework from [Unk](https://github.com/Who-Visions/unk-app-ai), the trading system Dave used. The upstream project documents three horizons and their default per-trade risk and reward-to-risk parameters:
+NouGenStocks carries forward the risk settings documented in [Unk](https://github.com/Who-Visions/unk-app-ai), the trading system Dave used. The upstream project documents three horizons and their default per-trade risk and reward-to-risk parameters:
 
 | Horizon | Risk budget | Target multiple | Upstream source |
 | --- | ---: | ---: | --- |
@@ -9,6 +9,10 @@ NouGenStocks carries forward the risk framework from [Unk](https://github.com/Wh
 | Scalper | 1% of account value | 1.5R | [strategy](https://github.com/Who-Visions/unk-app-ai/blob/main/services/strategies/stockscalper.py) |
 
 These are source-described defaults, not performance claims. The upstream project combines technical and fundamental inputs and describes ATR-based stop placement. NouGenStocks does not import its scoring signals or claim that the strategies are profitable.
+
+## Sample content
+
+Prices, fundamentals, indicator values, scores, grades, macro metrics, chart paths, and commentary in the current dashboard are illustrative UI fixtures. They are not live quotes or validated recommendations. The stock score is a local prototype and is not Unk's upstream scoring algorithm. Setup-grade multipliers and journal guardrails are NouGenStocks demo rules. New journals start empty; only entries users add are shown.
 
 ## Position planner
 

@@ -10,7 +10,7 @@ export type Stock = {
   volume: string
   sector: string
   points: number[]
-  // Unk Technical & Fundamental Sauce (Who-Visions / unk-app-ai):
+  // Illustrative values for UI prototyping; not live or sourced market data.
   rsi: number
   peRatio?: number
   revGrowthPct: number
@@ -256,7 +256,7 @@ export const stocks: Stock[] = [
     bestHorizon: 'SwingTrader',
     unkCommentary: "Unk: $300B+ cash pile earning 5%+ risk-free Treasury yield. Defends your portfolio like armor when macro storms roll in.",
   },
-  // Macro & Systematic ETFs from Professor G / Shard 29195:
+  // ETF values below are illustrative; video context is summarized separately.
   {
     symbol: 'SPMO',
     name: 'Invesco S&P 500 Momentum ETF',
@@ -338,28 +338,28 @@ export const macroRegime: MacroIndicator[] = [
     name: '10-Year Treasury Yield (5.12%)',
     metric: 'Over 5% (Multi-Year High)',
     status: 'WARNING',
-    source: 'Shard 29195 / Professor G',
-    insight: 'Spike to 5.12% exerts discount-rate pressure on high-PE equities. Prioritize cashflow and low-debt names.',
+    source: 'Video discussion · figure unverified',
+    insight: 'The speaker discusses yields as a headwind to higher-valuation equities. This is context, not a verified current reading.',
   },
   {
     name: 'WTI Crude Oil ($94.20/bbl)',
     metric: 'Pressing Near $100',
     status: 'WARNING',
-    source: 'Shard 29195 / Professor G',
-    insight: 'Elevated energy prices sustain headline CPI pressure, keeping Federal Reserve rate cuts on hold.',
+    source: 'Video discussion · figure unverified',
+    insight: 'The speaker links oil prices with inflation and rate expectations. This is an attributed view, not a live signal.',
   },
   {
     name: 'SPMO Momentum Concentration',
     metric: '+1.42% Relative Outperformance',
     status: 'BULLISH',
-    source: 'Shard 29195 / Professor G',
-    insight: 'Institutional capital continues concentrating into the top 20% momentum leaders despite macro drag.',
+    source: 'Video discussion · not verified',
+    insight: 'The video discusses momentum ETF rebalancing. Constituents and performance require current fund data.',
   },
   {
     name: 'SCHD Technology Pivot',
     metric: 'Surge in QCOM & Tech Weighting',
     status: 'BULLISH',
-    source: 'Shard 29195 / Professor G',
-    insight: 'Quality dividend strategies are shifting towards dividend-growing tech giants with strong balance sheets.',
+    source: 'Video discussion · not verified',
+    insight: 'The video discusses dividend ETF rebalancing. Constituents and weights require current fund data.',
   },
 ]
