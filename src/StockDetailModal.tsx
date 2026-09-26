@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Calculator, CheckCircle2, ExternalLink, Flame, LineChart, Newspaper, Shield } from 'lucide-react'
+import { Calculator, CheckCircle2, ExternalLink, Flame, LineChart, Newspaper, Radio, Shield } from 'lucide-react'
 import { type Stock } from './data'
-import { fetchLiveNews, type LiveNewsItem } from './marketApi'
+import { fetchLiveNews, type LiveNewsItem, type LiveQuote } from './marketApi'
 
 interface StockDetailModalProps {
   stock: Stock | null
+  liveQuote?: LiveQuote | null
   onClose: () => void
   onLoadIntoPlanner: (stock: Stock) => void
 }
 
-export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDetailModalProps) {
+export function StockDetailModal({ stock, liveQuote, onClose, onLoadIntoPlanner }: StockDetailModalProps) {
   const [news, setNews] = useState<LiveNewsItem[]>([])
   const [loadingNews, setLoadingNews] = useState(false)
 
@@ -30,6 +31,24 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
 
   if (!stock) return null
 
+  const isLive = Boolean(liveQuote)
+  const currentPrice = liveQuote ? liveQuote.price : stock.price
+  const currentChange = liveQuote ? liveQuote.change : stock.change
+  const currentChangePct = liveQuote ? liveQuote.changePct : stock.changePct
+  const currentVolume = liveQuote?.volume && liveQuote.volume !== 'N/A' ? liveQuote.volume : stock.volume
+
+  const handleLoadPlanner = () => {
+    onLoadIntoPlanner({
+      ...stock,
+      price: currentPrice,
+      change: currentChange,
+      changePct: currentChangePct,
+      volume: currentVolume,
+      isLive,
+    })
+    onClose()
+  }
+
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
       <section className="detail-modal" role="dialog" aria-modal="true" aria-labelledby="stock-detail-title">
@@ -37,12 +56,30 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
           <div className="detail-title-block">
             <span className={`ticker-icon ${stock.symbol.toLowerCase()}`}>{stock.symbol.slice(0, 1)}</span>
             <div>
-              <div className="detail-kicker">SAMPLE DATA · {stock.sector}</div>
+              <div className="detail-kicker">
+                {isLive ? (
+                  <span className="live-kicker">
+                    <span className="live-status-dot pulse" /> LIVE YAHOO PROXY · {stock.sector}
+                  </span>
+                ) : (
+                  `SAMPLE DATA · ${stock.sector}`
+                )}
+              </div>
               <h2 id="stock-detail-title">{stock.symbol} <span className="detail-name">{stock.name}</span></h2>
             </div>
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Close modal">×</button>
         </header>
+
+        {/* Live Quote Callout Banner */}
+        {isLive && liveQuote && (
+          <div className="live-quote-callout">
+            <Radio size={12} className="positive" />
+            <span>
+              Real-time quote: <b>${liveQuote.price.toFixed(2)}</b> ({liveQuote.changePct >= 0 ? '+' : ''}{liveQuote.changePct.toFixed(2)}%) · Prev close: ${liveQuote.previousClose.toFixed(2)} · {liveQuote.provenance}
+            </span>
+          </div>
+        )}
 
         {/* Sample score is a local prototype, not an upstream Unk signal. */}
         <div className="detail-unk-card">
@@ -62,13 +99,20 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
             <div className="panel-title"><LineChart size={14}/> Technical Setup</div>
             <div className="metric-row">
               <span>Price</span>
-              <b>${stock.price.toFixed(2)}</b>
+              <b>
+                ${currentPrice.toFixed(2)}
+                {isLive && <span className="live-tag">LIVE</span>}
+              </b>
             </div>
             <div className="metric-row">
               <span>Day Change</span>
-              <b className={stock.changePct >= 0 ? 'positive' : 'negative'}>
-                {stock.changePct >= 0 ? '+' : ''}{stock.change.toFixed(2)} ({stock.changePct.toFixed(2)}%)
+              <b className={currentChangePct >= 0 ? 'positive' : 'negative'}>
+                {currentChangePct >= 0 ? '+' : ''}{currentChange.toFixed(2)} ({currentChangePct.toFixed(2)}%)
               </b>
+            </div>
+            <div className="metric-row">
+              <span>Volume</span>
+              <b>{currentVolume}</b>
             </div>
             <div className="metric-row">
               <span>RSI (14)</span>
@@ -147,10 +191,7 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
           </div>
           <button
             className="primary-button"
-            onClick={() => {
-              onLoadIntoPlanner(stock)
-              onClose()
-            }}
+            onClick={handleLoadPlanner}
           >
             <Calculator size={14}/> Load {stock.symbol} into Trade Sizer
           </button>

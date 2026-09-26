@@ -23,6 +23,8 @@ export type Stock = {
   setupQuality: SetupGrade
   bestHorizon: TradeModeName
   unkCommentary: string
+  isLive?: boolean
+  provenance?: string
 }
 
 export const stocks: Stock[] = [

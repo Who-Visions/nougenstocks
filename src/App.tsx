@@ -16,6 +16,8 @@ import {
   LayoutDashboard,
   LineChart,
   Plus,
+  Radio,
+  RefreshCw,
   Search,
   Settings2,
   ShieldAlert,
@@ -26,6 +28,7 @@ import { chartSeries, defaultWatchlist, indices, stocks, type Stock } from './da
 import { StockDetailModal } from './StockDetailModal'
 import { TradingJournal } from './TradingJournal'
 import { MacroScanners } from './MacroScanners'
+import { fetchLiveQuote, type LiveQuote } from './marketApi'
 import {
   calculatePositionSize,
   SETUP_GRADES,
@@ -132,6 +135,13 @@ function App() {
   const [sort, setSort] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({ key: 'unkScore', direction: 'desc' })
   const [now, setNow] = useState(() => new Date())
 
+  // Live Market Feed State (Yahoo Finance v8 Free Proxy)
+  const [isLiveMarket, setIsLiveMarket] = useState<boolean>(() => localStorage.getItem('nougenstocks.live-feed.v1') === 'true')
+  const [liveQuotes, setLiveQuotes] = useState<Record<string, LiveQuote>>({})
+  const [liveLoading, setLiveLoading] = useState(false)
+  const [lastLiveTime, setLastLiveTime] = useState<string | null>(null)
+  const [liveError, setLiveError] = useState<string | null>(null)
+
   // Modal Detail State
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
 
@@ -147,6 +157,83 @@ function App() {
   const [stopPrice, setStopPrice] = useState('140.01')
 
   const clock = easternClock(now)
+
+  // Fetch Live Quotes for Watchlist + Active Ticker
+  const fetchWatchlistQuotes = async (symbolsToFetch?: string[]) => {
+    const symbols = symbolsToFetch || Array.from(new Set([...watchlist, activeTicker]))
+    if (symbols.length === 0) return
+    setLiveLoading(true)
+    setLiveError(null)
+
+    try {
+      const results = await Promise.allSettled(symbols.map(sym => fetchLiveQuote(sym)))
+      const newQuotes: Record<string, LiveQuote> = {}
+      let successCount = 0
+      results.forEach((res, idx) => {
+        const sym = symbols[idx]
+        if (res.status === 'fulfilled' && res.value) {
+          newQuotes[sym] = res.value
+          successCount++
+        }
+      })
+
+      if (successCount > 0) {
+        setLiveQuotes(prev => ({ ...prev, ...newQuotes }))
+        const timeStr = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/New_York',
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          timeZoneName: 'short',
+        }).format(new Date())
+        setLastLiveTime(timeStr)
+      } else {
+        setLiveError('Live feed endpoint offline or rate limited')
+      }
+    } catch (err: any) {
+      setLiveError(err?.message || 'Failed to fetch live quotes')
+    } finally {
+      setLiveLoading(false)
+    }
+  }
+
+  const toggleLiveMarket = () => {
+    const next = !isLiveMarket
+    setIsLiveMarket(next)
+    localStorage.setItem('nougenstocks.live-feed.v1', String(next))
+    if (next) {
+      fetchWatchlistQuotes()
+    }
+  }
+
+  // Polling for Live Quotes when feed is active
+  useEffect(() => {
+    if (!isLiveMarket) return
+    fetchWatchlistQuotes()
+    const interval = window.setInterval(() => {
+      fetchWatchlistQuotes()
+    }, 60_000)
+    return () => window.clearInterval(interval)
+  }, [isLiveMarket, watchlist.join(',')])
+
+  // Hydrate stocks with real-time live quotes if live mode is enabled
+  const displayStocks = useMemo(() => {
+    if (!isLiveMarket) return stocks
+    return stocks.map(stock => {
+      const live = liveQuotes[stock.symbol]
+      if (!live) return stock
+      return {
+        ...stock,
+        price: live.price,
+        change: live.change,
+        changePct: live.changePct,
+        volume: live.volume !== 'N/A' ? live.volume : stock.volume,
+        points: live.points && live.points.length >= 2 ? live.points : stock.points,
+        isLive: true,
+        provenance: live.provenance,
+      }
+    })
+  }, [isLiveMarket, liveQuotes])
 
   // Position Sizing Calculation via unkEngine
   const sizing = useMemo(() => {
@@ -166,7 +253,7 @@ function App() {
   }, [sizing, tradeMode])
 
   const visibleStocks = useMemo(() => {
-    const rows = stocks.filter(s => {
+    const rows = displayStocks.filter(s => {
       const inWatchlist = watchlist.includes(s.symbol)
       const matchesQuery = `${s.symbol} ${s.name} ${s.sector}`.toLowerCase().includes(query.toLowerCase())
       const matchesFilter =
@@ -194,15 +281,16 @@ function App() {
       const comparison = typeof av === 'string' && typeof bv === 'string' ? av.localeCompare(bv) : Number(av) - Number(bv)
       return comparison * (sort.direction === 'asc' ? 1 : -1)
     })
-  }, [query, filter, watchlist, sort])
+  }, [displayStocks, query, filter, watchlist, sort])
 
   const toggleStock = (symbol: string) => setWatchlist(current => current.includes(symbol) ? current.filter(s => s !== symbol) : [...current, symbol])
   const setSortKey = (key: SortKey) => setSort(current => current.key === key ? { key, direction: current.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: key === 'symbol' ? 'asc' : 'desc' })
 
   const loadStockIntoPlanner = (s: Stock) => {
+    const livePrice = (isLiveMarket && liveQuotes[s.symbol]) ? liveQuotes[s.symbol].price : s.price
     setActiveTicker(s.symbol)
-    setEntryPrice(s.price.toFixed(2))
-    const defStop = s.price * (1 - (TRADE_MODES[tradeMode].riskPct / 100))
+    setEntryPrice(livePrice.toFixed(2))
+    const defStop = livePrice * (1 - (TRADE_MODES[tradeMode].riskPct / 100))
     setStopPrice(defStop.toFixed(2))
     setSetupGrade(s.setupQuality)
     document.querySelector('#trade-prep')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -318,12 +406,12 @@ function App() {
           <button aria-label="Add stock" onClick={() => setAddOpen(true)}><Plus size={15} /></button>
         </div>
         <div className="side-tickers">
-          {stocks.filter(s => watchlist.includes(s.symbol)).slice(0, 6).map(s => (
+          {displayStocks.filter(s => watchlist.includes(s.symbol)).slice(0, 6).map(s => (
             <button className="side-ticker" key={s.symbol} onClick={() => setSelectedStock(s)}>
               <span className={`ticker-icon ${s.symbol.toLowerCase()}`}>{s.symbol.slice(0, 1)}</span>
               <span className="ticker-name">
                 <b>{s.symbol}</b>
-                <small>Sample metrics</small>
+                <small>{s.isLive ? 'Live quote' : 'Sample metrics'}</small>
               </span>
               <span className={s.changePct >= 0 ? 'positive' : 'negative'}>
                 {s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%
@@ -349,6 +437,28 @@ function App() {
         <header className="topbar">
           <div className="crumb"><span>Workspace</span><ChevronRight size={14} /><b>{activeNav}</b></div>
           <div className="top-actions">
+            <div className="live-data-toggle-group">
+              <button
+                className={`live-toggle-btn ${isLiveMarket ? 'active' : ''}`}
+                onClick={toggleLiveMarket}
+                title={isLiveMarket ? "Live Yahoo Finance proxy active. Click to switch to offline sample fixtures." : "Enable live Yahoo Finance proxy market data."}
+              >
+                <span className={`live-status-dot ${isLiveMarket ? 'pulse' : ''}`} />
+                <span>{isLiveMarket ? 'LIVE FEED: ON' : 'LIVE FEED: OFF'}</span>
+              </button>
+              {isLiveMarket && (
+                <button
+                  className="refresh-btn"
+                  onClick={() => fetchWatchlistQuotes()}
+                  disabled={liveLoading}
+                  title="Refresh live quotes from Yahoo Finance"
+                  aria-label="Refresh quotes"
+                >
+                  <RefreshCw size={12} className={liveLoading ? 'spinning' : ''} />
+                  {lastLiveTime && <span className="last-sync">{lastLiveTime}</span>}
+                </button>
+              )}
+            </div>
             <div className="market-open" title="Clock uses weekday session hours; exchange holidays are not included">
               <span className="pulse-dot" /> {clock.session === 'WEEKDAY SESSION HOURS' ? 'REGULAR HOURS' : 'OUTSIDE REGULAR HOURS'} <span className="market-time">· {clock.time}</span>
             </div>
@@ -530,7 +640,7 @@ function App() {
 
           {/* Macro Regime & Strategy Scanners Strip */}
           <MacroScanners
-            stocks={stocks}
+            stocks={displayStocks}
             onSelectStock={s => {
               setSelectedStock(s)
               loadStockIntoPlanner(s)
@@ -582,11 +692,32 @@ function App() {
             <div className="stocks-heading">
               <div>
                 <div className="section-kicker">YOUR PULSE ON THE MARKET</div>
-                <h2>Watchlist &amp; Unk Signals <span className="count-pill">{watchlist.length}</span></h2>
+                <h2>
+                  Watchlist &amp; Unk Signals
+                  <span className="count-pill">{watchlist.length}</span>
+                  {isLiveMarket ? (
+                    <span className="data-source-badge live" title="Hydrating with real-time Yahoo Finance v8 chart data">
+                      <Radio size={11} /> LIVE YAHOO PROXY
+                    </span>
+                  ) : (
+                    <span className="data-source-badge sample" title="Using curated offline sample dataset for demo and testing">
+                      SAMPLE FIXTURES
+                    </span>
+                  )}
+                </h2>
               </div>
-              <button className="text-button" onClick={() => { setFilter('All'); setQuery('') }}>
-                Clear filters <ChevronRight size={15} />
-              </button>
+              <div className="stocks-heading-actions">
+                <button
+                  className={`mini-feed-toggle ${isLiveMarket ? 'active' : ''}`}
+                  onClick={toggleLiveMarket}
+                  title="Toggle real-time quote hydration"
+                >
+                  {isLiveMarket ? 'Switch to Sample' : 'Go Live'}
+                </button>
+                <button className="text-button" onClick={() => { setFilter('All'); setQuery('') }}>
+                  Clear filters <ChevronRight size={15} />
+                </button>
+              </div>
             </div>
             <div className="table-controls">
               <div className="filter-tabs">
@@ -646,7 +777,10 @@ function App() {
                           </span>
                         </div>
                       </td>
-                      <td className="mono">${s.price.toFixed(2)}</td>
+                      <td className="mono">
+                        ${s.price.toFixed(2)}
+                        {s.isLive && <span className="live-tag" title="Hydrated via Yahoo Finance live proxy">LIVE</span>}
+                      </td>
                       <td>
                         <div className={`change-cell ${s.changePct >= 0 ? 'positive' : 'negative'}`}>
                           {s.changePct >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
@@ -693,7 +827,15 @@ function App() {
               {visibleStocks.length === 0 && <div className="empty-state">No symbols match this view.</div>}
             </div>
             <div className="table-foot">
-              <span>Showing <b>{visibleStocks.length}</b> of <b>{watchlist.length}</b> symbols <span className="sample-note">· sample metrics, no live Unk score</span></span>
+              <span>
+                Showing <b>{visibleStocks.length}</b> of <b>{watchlist.length}</b> symbols
+                {isLiveMarket ? (
+                  <span className="live-provenance-note"> · Yahoo Finance v8 proxy active {lastLiveTime ? `(synced ${lastLiveTime})` : ''}</span>
+                ) : (
+                  <span className="sample-note"> · sample metrics, no live Unk score</span>
+                )}
+                {liveError && <span className="live-err-note"> · {liveError}</span>}
+              </span>
               <button onClick={() => setAddOpen(true)}><Plus size={14} /> Add symbols</button>
             </div>
           </section>
@@ -716,6 +858,7 @@ function App() {
       {/* Stock Deep-Dive Dossier Modal */}
       <StockDetailModal
         stock={selectedStock}
+        liveQuote={selectedStock ? liveQuotes[selectedStock.symbol] || null : null}
         onClose={() => setSelectedStock(null)}
         onLoadIntoPlanner={s => loadStockIntoPlanner(s)}
       />

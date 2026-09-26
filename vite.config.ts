@@ -2,11 +2,8 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
 function freeMarketProxyPlugin(): Plugin {
-  return {
-    name: 'free-market-proxy',
-    configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
-        if (!req.url) return next()
+  const handleRequest = async (req: any, res: any, next: any) => {
+    if (!req.url) return next()
 
         // 1. Live Quotes Proxy: /api/quote/:symbol
         if (req.url.startsWith('/api/quote/')) {
@@ -124,7 +121,15 @@ function freeMarketProxyPlugin(): Plugin {
         }
 
         next()
-      })
+      }
+
+  return {
+    name: 'free-market-proxy',
+    configureServer(server) {
+      server.middlewares.use(handleRequest)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(handleRequest)
     },
   }
 }
