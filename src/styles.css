@@ -127,3 +127,11 @@
   .scanners-grid{grid-template-columns:1fr}
   .detail-body-grid{grid-template-columns:1fr}
 }
+
+/* Live News Headlines in Modal */
+.detail-news-section{background:#0b0f15;border:1px solid #1f2732;border-radius:8px;padding:14px;margin-bottom:20px}
+.news-loading,.news-empty{font-size:10px;color:#7e8b98;padding:8px 0}
+.news-list{display:grid;gap:8px}
+.news-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 10px;background:#10151d;border:1px solid #202b38;border-radius:5px;color:#cbd7e3;text-decoration:none;font-size:10.5px;line-height:1.4}
+.news-item:hover{background:#161e29;border-color:#3a4b5f;color:#fff}
+.news-item svg{color:#79899a;flex-shrink:0}

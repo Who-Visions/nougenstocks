@@ -1,5 +1,7 @@
-import { Calculator, CheckCircle2, Flame, LineChart, Shield } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Calculator, CheckCircle2, ExternalLink, Flame, LineChart, Newspaper, Shield } from 'lucide-react'
 import { type Stock } from './data'
+import { fetchLiveNews, type LiveNewsItem } from './marketApi'
 
 interface StockDetailModalProps {
   stock: Stock | null
@@ -8,6 +10,24 @@ interface StockDetailModalProps {
 }
 
 export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDetailModalProps) {
+  const [news, setNews] = useState<LiveNewsItem[]>([])
+  const [loadingNews, setLoadingNews] = useState(false)
+
+  useEffect(() => {
+    if (!stock) return
+    let active = true
+    setLoadingNews(true)
+    fetchLiveNews(stock.symbol).then(items => {
+      if (active) {
+        setNews(items)
+        setLoadingNews(false)
+      }
+    })
+    return () => {
+      active = false
+    }
+  }, [stock?.symbol])
+
   if (!stock) return null
 
   return (
@@ -92,6 +112,31 @@ export function StockDetailModal({ stock, onClose, onLoadIntoPlanner }: StockDet
               <b>{stock.debtToEquity}</b>
             </div>
           </div>
+        </div>
+
+        {/* Live News Headlines via Free Proxy */}
+        <div className="detail-news-section">
+          <div className="panel-title"><Newspaper size={14}/> Live Market Headlines (Free Proxy)</div>
+          {loadingNews ? (
+            <div className="news-loading">Fetching current headlines...</div>
+          ) : news.length > 0 ? (
+            <div className="news-list">
+              {news.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="news-item"
+                >
+                  <span>{item.title}</span>
+                  <ExternalLink size={12}/>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="news-empty">No headlines returned for {stock.symbol}.</div>
+          )}
         </div>
 
         {/* Action Foot */}
