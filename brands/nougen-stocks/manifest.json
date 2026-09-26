@@ -1,0 +1,12 @@
+{
+  "brand": "NouGenStocks",
+  "version": "1.0.0",
+  "description": "A focused market dashboard and trade preparation interface.",
+  "source_of_truth": "brands/nougen-stocks/DESIGN.md",
+  "tokens": "brands/nougen-stocks/tokens.css",
+  "provenance": {
+    "observed": "Existing NouGenStocks product name, dark dashboard, market tables, charts, and green accent.",
+    "inferred": "Dense financial data benefits from restrained color, clear numeric hierarchy, and high-contrast status states.",
+    "invented": "The semantic token names, light theme, focus treatment, and component guidance in this package."
+  }
+}

@@ -158,6 +158,12 @@ function App() {
       grade: setupGrade,
     })
   }, [accountValue, entryPrice, stopPrice, tradeMode, setupGrade])
+  const plannedTarget = useMemo(() => {
+    if (!sizing.valid) return { price: 0, profit: 0, multiple: TRADE_MODES[tradeMode].rewardRisk }
+    const multiple = TRADE_MODES[tradeMode].rewardRisk
+    const target = sizing.targets.r1 + sizing.perShareRisk * (multiple - 1)
+    return { price: Number(target.toFixed(2)), profit: Number((sizing.actualRiskAmount * multiple).toFixed(2)), multiple }
+  }, [sizing, tradeMode])
 
   const visibleStocks = useMemo(() => {
     const rows = stocks.filter(s => {
@@ -343,8 +349,8 @@ function App() {
         <header className="topbar">
           <div className="crumb"><span>Workspace</span><ChevronRight size={14} /><b>{activeNav}</b></div>
           <div className="top-actions">
-            <div className="market-open" title="Weekday session hours only; exchange holidays are not included">
-              <span className="pulse-dot" /> {clock.session} <span className="market-time">· {clock.time}</span>
+            <div className="market-open" title="Clock uses weekday session hours; exchange holidays are not included">
+              <span className="pulse-dot" /> {clock.session === 'WEEKDAY SESSION HOURS' ? 'REGULAR HOURS' : 'OUTSIDE REGULAR HOURS'} <span className="market-time">· {clock.time}</span>
             </div>
             <div className="top-avatar">DW</div>
           </div>
@@ -356,7 +362,7 @@ function App() {
             <div>
               <div className="eyebrow"><Activity size={13} /> {clock.date.toUpperCase()}</div>
               <h1>Market overview<span className="heading-dot">.</span></h1>
-              <p className="subheading">Systematic Unk Method execution &amp; macroeconomic pulse.</p>
+              <p className="subheading">Unk risk settings · illustrative market data</p>
             </div>
             <button className={`primary-button ${saved ? 'saved' : ''}`} onClick={() => setSaved(!saved)}>
               {saved ? <><Star size={15} fill="currentColor" /> Dashboard saved</> : <><Plus size={15} /> Save dashboard</>}
@@ -457,8 +463,8 @@ function App() {
                 </div>
                 <div>
                   <small>RISK TARGETS</small>
-                  <strong>{sizing.valid ? `$${sizing.targets.r2.toFixed(2)}` : '—'}</strong>
-                  <em>2R: +${sizing.targets.r2Profit.toLocaleString()}</em>
+                  <strong>{sizing.valid ? `$${plannedTarget.price.toFixed(2)}` : '—'}</strong>
+                  <em>{plannedTarget.multiple}R: +${plannedTarget.profit.toLocaleString()}</em>
                 </div>
                 <div>
                   <small>POSITION VALUE</small>
@@ -487,9 +493,9 @@ function App() {
                   <span className="positive">+${sizing.targets.r1Profit.toFixed(2)}</span>
                 </div>
                 <div className="ladder-step r2 active">
-                  <small>2R TARGET (PLAN)</small>
-                  <b>${sizing.targets.r2.toFixed(2)}</b>
-                  <span className="positive">+${sizing.targets.r2Profit.toFixed(2)}</span>
+                  <small>{plannedTarget.multiple}R TARGET (PLAN)</small>
+                  <b>${plannedTarget.price.toFixed(2)}</b>
+                  <span className="positive">+${plannedTarget.profit.toFixed(2)}</span>
                 </div>
                 <div className="ladder-step r3">
                   <small>3R RUNNER</small>
