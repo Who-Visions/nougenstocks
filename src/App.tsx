@@ -135,8 +135,14 @@ function App() {
   const [sort, setSort] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({ key: 'unkScore', direction: 'desc' })
   const [now, setNow] = useState(() => new Date())
 
-  // Live Market Feed State (Yahoo Finance v8 Free Proxy)
-  const [isLiveMarket, setIsLiveMarket] = useState<boolean>(() => localStorage.getItem('nougenstocks.live-feed.v1') === 'true')
+  // Always Live Market Feed State (Defaults to true, powered by Yahoo Finance free proxy)
+  const [isLiveMarket, setIsLiveMarket] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('nougenstocks.live-feed.v1') !== 'false'
+    } catch {
+      return true
+    }
+  })
   const [liveQuotes, setLiveQuotes] = useState<Record<string, LiveQuote>>({})
   const [liveLoading, setLiveLoading] = useState(false)
   const [lastLiveTime, setLastLiveTime] = useState<string | null>(null)
@@ -158,9 +164,19 @@ function App() {
 
   const clock = easternClock(now)
 
-  // Fetch Live Quotes for Watchlist + Active Ticker
+  const INDEX_TICKERS = ['SPY', 'QQQ', 'DIA', '^TNX', 'CL=F', 'SPMO']
+  const INDEX_PROXIES: Record<string, { ticker: string; isYield?: boolean; isCommodity?: boolean }> = {
+    'S&P 500': { ticker: 'SPY' },
+    'NASDAQ': { ticker: 'QQQ' },
+    'DOW JONES': { ticker: 'DIA' },
+    '10Y YIELD': { ticker: '^TNX', isYield: true },
+    'WTI CRUDE': { ticker: 'CL=F', isCommodity: true },
+    'SPMO (MOM)': { ticker: 'SPMO' },
+  }
+
+  // Fetch Live Quotes for Watchlist + Active Ticker + Macro Indices
   const fetchWatchlistQuotes = async (symbolsToFetch?: string[]) => {
-    const symbols = symbolsToFetch || Array.from(new Set([...watchlist, activeTicker]))
+    const symbols = symbolsToFetch || Array.from(new Set([...watchlist, activeTicker, ...INDEX_TICKERS]))
     if (symbols.length === 0) return
     setLiveLoading(true)
     setLiveError(null)
@@ -206,15 +222,39 @@ function App() {
     }
   }
 
-  // Polling for Live Quotes when feed is active
+  // Polling for Live Quotes when feed is active (Always Live)
   useEffect(() => {
     if (!isLiveMarket) return
     fetchWatchlistQuotes()
     const interval = window.setInterval(() => {
       fetchWatchlistQuotes()
-    }, 60_000)
+    }, 45_000)
     return () => window.clearInterval(interval)
   }, [isLiveMarket, watchlist.join(',')])
+
+  // Hydrate Macro Indices with real-time quote feeds
+  const displayIndices = useMemo(() => {
+    return indices.map(idx => {
+      const proxy = INDEX_PROXIES[idx.symbol]
+      const live = proxy ? liveQuotes[proxy.ticker] : null
+      if (!isLiveMarket || !live) return { ...idx, isLive: false }
+
+      const formattedVal = proxy.isYield
+        ? `${live.price.toFixed(2)}%`
+        : proxy.isCommodity
+        ? `$${live.price.toFixed(2)}`
+        : `$${live.price.toFixed(2)}`
+
+      return {
+        ...idx,
+        value: formattedVal,
+        change: `${live.changePct >= 0 ? '+' : ''}${live.changePct.toFixed(2)}%`,
+        up: live.changePct >= 0,
+        points: live.points && live.points.length >= 2 ? live.points : idx.points,
+        isLive: true,
+      }
+    })
+  }, [liveQuotes, isLiveMarket])
 
   // Hydrate stocks with real-time live quotes if live mode is enabled
   const displayStocks = useMemo(() => {
@@ -441,10 +481,10 @@ function App() {
               <button
                 className={`live-toggle-btn ${isLiveMarket ? 'active' : ''}`}
                 onClick={toggleLiveMarket}
-                title={isLiveMarket ? "Live Yahoo Finance proxy active. Click to switch to offline sample fixtures." : "Enable live Yahoo Finance proxy market data."}
+                title={isLiveMarket ? "Always Live feed active (Yahoo Finance v8 proxy). Click to pause live streaming." : "Enable live Yahoo Finance proxy market data."}
               >
                 <span className={`live-status-dot ${isLiveMarket ? 'pulse' : ''}`} />
-                <span>{isLiveMarket ? 'LIVE FEED: ON' : 'LIVE FEED: OFF'}</span>
+                <span>{isLiveMarket ? 'ALWAYS LIVE: ON' : 'ALWAYS LIVE: OFF'}</span>
               </button>
               {isLiveMarket && (
                 <button
@@ -472,7 +512,13 @@ function App() {
             <div>
               <div className="eyebrow"><Activity size={13} /> {clock.date.toUpperCase()}</div>
               <h1>Market overview<span className="heading-dot">.</span></h1>
-              <p className="subheading">Unk risk settings · illustrative market data</p>
+              <p className="subheading">
+                {isLiveMarket ? (
+                  <>Always Live · Real-time market feeds · Unk risk engine</>
+                ) : (
+                  <>Unk risk settings · illustrative market data</>
+                )}
+              </p>
             </div>
             <button className={`primary-button ${saved ? 'saved' : ''}`} onClick={() => setSaved(!saved)}>
               {saved ? <><Star size={15} fill="currentColor" /> Dashboard saved</> : <><Plus size={15} /> Save dashboard</>}
@@ -481,7 +527,7 @@ function App() {
 
           {/* Major Macro & Systematic Instruments Strip */}
           <section className="index-grid">
-            {indices.map(index => (
+            {displayIndices.map(index => (
               <article className="index-card" key={index.symbol}>
                 <div className="index-top">
                   <span>{index.symbol}</span>
@@ -492,7 +538,7 @@ function App() {
                 </div>
                 <div className="index-value">{index.value}</div>
                 <div className="index-bottom">
-                  <span>Today</span>
+                  <span>{index.isLive ? 'Real-time' : 'Today'}</span>
                   <Sparkline points={index.points} up={index.up} />
                 </div>
               </article>
