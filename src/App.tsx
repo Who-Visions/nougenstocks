@@ -91,7 +91,7 @@ function volumeValue(volume: string) {
 }
 
 function Sparkline({ points, up, large = false }: { points: number[]; up: boolean; large?: boolean }) {
-  const color = up ? '#b5f36b' : '#f07875'
+  const color = up ? '#10b981' : '#f43f5e'
   const width = large ? 820 : 116
   const height = large ? 230 : 38
   const min = Math.min(...points)
