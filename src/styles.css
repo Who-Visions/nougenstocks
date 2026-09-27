@@ -1826,5 +1826,428 @@
   color: #64748b !important;
 }
 
+/* ==========================================================================
+   VIX Volatility & Cash Reserve Meter
+   ========================================================================== */
+.vix-allocation-banner {
+  background: linear-gradient(135deg, #0d121a 0%, #0a0e14 100%);
+  border: 1px solid #1e293b;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.vix-banner-left {
+  display: grid;
+  gap: 6px;
+}
+
+.vix-banner-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vix-icon {
+  color: #f59e0b;
+}
+
+.vix-banner-title h3 {
+  font: 700 16px Manrope, sans-serif;
+  margin: 0;
+  color: #ffffff;
+}
+
+.vix-banner-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.vix-tactical-callout {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-top: 4px;
+}
+
+.vix-banner-right {
+  display: grid;
+  gap: 14px;
+  background: #080c12;
+  border: 1px solid #16202e;
+  border-radius: 6px;
+  padding: 14px;
+}
+
+.vix-meter-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vix-stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #64748b;
+}
+
+.vix-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.vix-quick-selects {
+  display: flex;
+  gap: 6px;
+}
+
+.vix-preset-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vix-preset-btn:hover {
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.vix-preset-btn.active {
+  background: #f59e0b;
+  border-color: #d97706;
+  color: #000000;
+  font-weight: 700;
+}
+
+.allocation-progress-card {
+  display: grid;
+  gap: 6px;
+}
+
+.allocation-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.allocation-bar-labels b {
+  color: #ffffff;
+}
+
+.allocation-track {
+  height: 10px;
+  background: #1e293b;
+  border-radius: 5px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.allocation-fill.cash-fill {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  transition: width 0.3s ease;
+}
+
+.allocation-fill.equity-fill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+.allocation-subhint {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #64748b;
+}
+
+/* ==========================================================================
+   Wheel Scanner Highlight Card
+   ========================================================================== */
+.scanner-card.wheel-highlight {
+  border-color: #047857;
+  background: linear-gradient(180deg, #091712 0%, #060d0a 100%);
+}
+
+.scanner-card.wheel-highlight .scanner-badge {
+  color: #34d399;
+}
+
+/* ==========================================================================
+   Stock Detail Options Wheel & Paid DCA Panel
+   ========================================================================== */
+.detail-wheel-panel {
+  background: #080c12;
+  border: 1px solid #1a2936;
+  border-left: 3px solid #10b981;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.wheel-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wheel-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 13px Manrope, sans-serif;
+  color: #f1f5f9;
+}
+
+.wheel-yield-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  color: #34d399;
+  border-radius: 12px;
+}
+
+.wheel-explainer {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.wheel-explainer b {
+  color: #f59e0b;
+}
+
+.wheel-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.wheel-metric-card {
+  background: #0d1520;
+  border: 1px solid #162434;
+  border-radius: 4px;
+  padding: 8px 10px;
+  display: grid;
+  gap: 2px;
+}
+
+.wheel-metric-card .label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wheel-metric-card .val {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.wheel-metric-card .val.positive {
+  color: #10b981;
+}
+
+.wheel-metric-card .sub {
+  font-size: 9px;
+  color: #64748b;
+}
+
+.wheel-metric-card .sub.positive {
+  color: #34d399;
+  font-weight: 600;
+}
+
+.wheel-callout-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  border-top: 1px solid #14202c;
+  gap: 12px;
+}
+
+.wheel-callout-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.wheel-callout-text b {
+  color: #e2e8f0;
+}
+
+.wheel-action-btn {
+  background: #10b981;
+  color: #022c22;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.wheel-action-btn:hover {
+  background: #34d399;
+}
+
+/* ==========================================================================
+   Light Mode Zero-Dark-Spot Overrides for VIX & Wheel
+   ========================================================================== */
+:root[data-theme="light"] .vix-allocation-banner {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-left-color: #d97706 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+}
+
+:root[data-theme="light"] .vix-banner-title h3 {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .vix-banner-desc {
+  color: #475569 !important;
+}
+
+:root[data-theme="light"] .vix-tactical-callout {
+  background: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #065f46 !important;
+}
+
+:root[data-theme="light"] .vix-banner-right {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+:root[data-theme="light"] .vix-stat-label {
+  color: #64748b !important;
+}
+
+:root[data-theme="light"] .vix-stat-value {
+  color: #b45309 !important;
+}
+
+:root[data-theme="light"] .vix-preset-btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+:root[data-theme="light"] .vix-preset-btn:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .vix-preset-btn.active {
+  background: #f59e0b !important;
+  border-color: #d97706 !important;
+  color: #000000 !important;
+}
+
+:root[data-theme="light"] .allocation-bar-labels {
+  color: #334155 !important;
+}
+
+:root[data-theme="light"] .allocation-bar-labels b {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .allocation-track {
+  background: #e2e8f0 !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.06) !important;
+}
+
+:root[data-theme="light"] .scanner-card.wheel-highlight {
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+}
+
+:root[data-theme="light"] .scanner-card.wheel-highlight .scanner-badge {
+  color: #15803d !important;
+}
+
+:root[data-theme="light"] .detail-wheel-panel {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-left-color: #10b981 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+}
+
+:root[data-theme="light"] .wheel-panel-title {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .wheel-yield-badge {
+  background: #ecfdf5 !important;
+  border-color: #6ee7b7 !important;
+  color: #047857 !important;
+}
+
+:root[data-theme="light"] .wheel-explainer {
+  color: #475569 !important;
+}
+
+:root[data-theme="light"] .wheel-explainer b {
+  color: #b45309 !important;
+}
+
+:root[data-theme="light"] .wheel-metric-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+:root[data-theme="light"] .wheel-metric-card .val {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .wheel-metric-card .val.positive {
+  color: #047857 !important;
+}
+
+:root[data-theme="light"] .wheel-callout-foot {
+  border-top-color: #e2e8f0 !important;
+}
+
+:root[data-theme="light"] .wheel-callout-text {
+  color: #475569 !important;
+}
+
+:root[data-theme="light"] .wheel-callout-text b {
+  color: #0f172a !important;
+}
+
+
 
 

@@ -297,3 +297,109 @@ export function computeCushionStatus(
     circuitBreakerReason,
   }
 }
+
+export interface VolatilityAllocation {
+  vix: number
+  targetCashPct: number
+  targetEquityPct: number
+  regime: 'COMPLACENCY' | 'NORMAL' | 'ELEVATED' | 'PANIC'
+  statusBadge: 'WARNING' | 'NEUTRAL' | 'BULLISH'
+  recommendation: string
+  tacticalAction: string
+}
+
+export function calculateVolatilityCashBuffer(vix: number): VolatilityAllocation {
+  if (vix < 15) {
+    return {
+      vix,
+      targetCashPct: 30,
+      targetEquityPct: 70,
+      regime: 'COMPLACENCY',
+      statusBadge: 'WARNING',
+      recommendation: 'Low volatility with oversold breadth risk. Hold 28%–33% cash reserves for flash dip buying power.',
+      tacticalAction: 'Do not chase market orders at highs. Deploy 70% in Cash-Secured Puts and Covered Strangles.',
+    }
+  } else if (vix <= 22) {
+    return {
+      vix,
+      targetCashPct: 20,
+      targetEquityPct: 80,
+      regime: 'NORMAL',
+      statusBadge: 'NEUTRAL',
+      recommendation: 'Balanced volatility regime. Standard institutional 80/20 equity-to-cash operational baseline.',
+      tacticalAction: 'Run systematic swing entries along the 20 EMA with standard 2% per-trade risk sizing.',
+    }
+  } else if (vix <= 30) {
+    return {
+      vix,
+      targetCashPct: 15,
+      targetEquityPct: 85,
+      regime: 'ELEVATED',
+      statusBadge: 'WARNING',
+      recommendation: 'Elevated market fear. Begin deploying dry powder into high-quality franchise names at dealer floors.',
+      tacticalAction: 'Sell deep out-of-the-money cash-secured puts with expanded IV premium at key support levels.',
+    }
+  } else {
+    return {
+      vix,
+      targetCashPct: 5,
+      targetEquityPct: 95,
+      regime: 'PANIC',
+      statusBadge: 'BULLISH',
+      recommendation: 'Extreme panic / capitulation. Maximum capital deployment zone (Humphrey Yang / Ryan capitulation rule).',
+      tacticalAction: 'Aggressively deploy accumulated dry powder into generational dividend & index compounding engines.',
+    }
+  }
+}
+
+export interface OptionsWheelPlan {
+  symbol: string
+  currentPrice: number
+  cspStrike: number
+  estimatedPremium: number
+  netEffectiveCostBasis: number
+  discountFromMarketPct: number
+  annualizedYieldPct: number
+  coveredCallStrike: number
+  ccEstimatedPremium: number
+  strangleMonthlyIncome: number
+  gexSupportLevel: number
+  recommendation: string
+}
+
+export function calculateOptionsWheelPlan(symbol: string, currentPrice: number, rsi: number): OptionsWheelPlan {
+  const discountMultiplier = rsi > 65 ? 0.94 : rsi < 40 ? 0.97 : 0.95
+  const rawStrike = currentPrice * discountMultiplier
+  const strikeRounding = currentPrice > 150 ? 5 : currentPrice > 50 ? 2.5 : 1
+  const cspStrike = Math.floor(rawStrike / strikeRounding) * strikeRounding
+
+  const premiumRate = rsi > 65 ? 0.024 : 0.019
+  const estimatedPremium = Number((cspStrike * premiumRate).toFixed(2))
+
+  const netEffectiveCostBasis = Number((cspStrike - estimatedPremium).toFixed(2))
+  const discountFromMarketPct = Number((((currentPrice - netEffectiveCostBasis) / currentPrice) * 100).toFixed(1))
+  const annualizedYieldPct = Number(((estimatedPremium / (cspStrike || 1)) * 12 * 100).toFixed(1))
+
+  const ccRawStrike = currentPrice * (rsi > 65 ? 1.08 : 1.05)
+  const coveredCallStrike = Math.ceil(ccRawStrike / strikeRounding) * strikeRounding
+  const ccEstimatedPremium = Number((coveredCallStrike * 0.016).toFixed(2))
+  const strangleMonthlyIncome = Number((estimatedPremium + ccEstimatedPremium).toFixed(2))
+
+  const gexSupportLevel = Math.floor(cspStrike * 0.97)
+
+  return {
+    symbol,
+    currentPrice,
+    cspStrike,
+    estimatedPremium,
+    netEffectiveCostBasis,
+    discountFromMarketPct,
+    annualizedYieldPct,
+    coveredCallStrike,
+    ccEstimatedPremium,
+    strangleMonthlyIncome,
+    gexSupportLevel,
+    recommendation: `Sell the $${cspStrike} Cash-Secured Put to collect $${estimatedPremium.toFixed(2)}/share ($${(estimatedPremium * 100).toFixed(0)} per contract). Effective net basis $${netEffectiveCostBasis} (${discountFromMarketPct}% below market).`,
+  }
+}
+

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Calculator, CheckCircle2, ExternalLink, Flame, LineChart, Newspaper, Radio, Shield } from 'lucide-react'
+import { Calculator, CheckCircle2, Coins, ExternalLink, Flame, Layers, LineChart, Newspaper, Radio, Shield } from 'lucide-react'
 import { type Stock } from './data'
 import { fetchLiveNews, type LiveNewsItem, type LiveQuote } from './marketApi'
+import { calculateOptionsWheelPlan } from './unkEngine'
 
 interface StockDetailModalProps {
   stock: Stock | null
@@ -36,6 +37,8 @@ export function StockDetailModal({ stock, liveQuote, onClose, onLoadIntoPlanner 
   const currentChange = liveQuote ? liveQuote.change : stock.change
   const currentChangePct = liveQuote ? liveQuote.changePct : stock.changePct
   const currentVolume = liveQuote?.volume && liveQuote.volume !== 'N/A' ? liveQuote.volume : stock.volume
+
+  const wheelPlan = calculateOptionsWheelPlan(stock.symbol, currentPrice, stock.rsi)
 
   const handleLoadPlanner = () => {
     onLoadIntoPlanner({
@@ -155,6 +158,67 @@ export function StockDetailModal({ stock, liveQuote, onClose, onLoadIntoPlanner 
               <span>Debt / Equity</span>
               <b>{stock.debtToEquity}</b>
             </div>
+          </div>
+        </div>
+
+        {/* Institutional Options Wheel & Paid DCA Engine */}
+        <div className="detail-wheel-panel">
+          <div className="wheel-panel-header">
+            <div className="wheel-panel-title">
+              <Coins size={15} className="positive" />
+              <span>Options Wheel &amp; "Paid to DCA" Desk Plan</span>
+            </div>
+            <span className="wheel-yield-badge">+{wheelPlan.annualizedYieldPct}% Est. APR</span>
+          </div>
+
+          <p className="wheel-explainer">
+            <b>Options Desk Rule:</b> Don't market-buy at highs. Sell near-the-money Cash-Secured Puts to get paid to dollar-cost average. If assigned, your net basis is discounted; if unassigned, you keep 100% of the premium.
+          </p>
+
+          <div className="wheel-metrics-grid">
+            <div className="wheel-metric-card">
+              <span className="label">Recommended Put Strike</span>
+              <b className="val mono">${wheelPlan.cspStrike.toFixed(2)}</b>
+              <span className="sub">~4-6% Below Market</span>
+            </div>
+            <div className="wheel-metric-card">
+              <span className="label">Option Premium Collected</span>
+              <b className="val positive mono">+${wheelPlan.estimatedPremium.toFixed(2)}/sh</b>
+              <span className="sub">${(wheelPlan.estimatedPremium * 100).toFixed(0)} / contract</span>
+            </div>
+            <div className="wheel-metric-card">
+              <span className="label">Net Effective Cost Basis</span>
+              <b className="val mono">${wheelPlan.netEffectiveCostBasis.toFixed(2)}</b>
+              <span className="sub positive">-{wheelPlan.discountFromMarketPct}% Discount</span>
+            </div>
+            <div className="wheel-metric-card">
+              <span className="label">Covered Strangle Call</span>
+              <b className="val mono">${wheelPlan.coveredCallStrike.toFixed(2)}</b>
+              <span className="sub">+${wheelPlan.strangleMonthlyIncome.toFixed(2)} Total Bilateral Yield</span>
+            </div>
+          </div>
+
+          <div className="wheel-callout-foot">
+            <div className="wheel-callout-text">
+              <Layers size={13} />
+              <span><b>Dealer GEX Floor:</b> ${wheelPlan.gexSupportLevel.toFixed(2)} (Market Maker Put Wall)</span>
+            </div>
+            <button
+              className="wheel-action-btn"
+              onClick={() => {
+                onLoadIntoPlanner({
+                  ...stock,
+                  price: wheelPlan.netEffectiveCostBasis,
+                  change: currentChange,
+                  changePct: currentChangePct,
+                  volume: currentVolume,
+                  isLive,
+                })
+                onClose()
+              }}
+            >
+              Load Net Basis (${wheelPlan.netEffectiveCostBasis}) into Sizer
+            </button>
           </div>
         </div>
 

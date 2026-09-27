@@ -74,6 +74,34 @@ export const UNK_MARKET_TERMS: UnkTerm[] = [
     category: 'Execution',
     example: 'Setup is Grade A, above VWAP with 3:1 R:R. Sizing 283 shares. Bet.',
   },
+  {
+    term: 'The 70/30 Clip',
+    translation: 'Maintaining 30% cash dry powder and 70% active positions.',
+    tradingContext: 'Never go 100% margin or 100% cash. Keep 30% in the vault so when the market fakes out or VIX spikes, you are the one buying the dip.',
+    category: 'Risk',
+    example: 'VIX is at 14. Unk is holding the 70/30 clip—70% in high conviction wheels, 30% cash waiting for the flush.',
+  },
+  {
+    term: 'Get Paid to DCA',
+    translation: 'Selling Cash-Secured Puts to acquire shares at a discount instead of market buying.',
+    tradingContext: 'Instead of chasing green candles at highs, sell out-of-the-money puts at structural support. Collect premium while waiting for your target entry price.',
+    category: 'Execution',
+    example: 'Wanted 200 shares of GOOGL. Sold the 337.5 puts for $460 premium. Paid to DCA—no cap.',
+  },
+  {
+    term: 'Covered Strangle Motion',
+    translation: 'Holding 100+ shares and selling both an OTM covered call and an OTM cash-secured put.',
+    tradingContext: 'Monetizing range-bound volatility on quality assets. Harvest bilateral decay while awaiting long-term structural expansion.',
+    category: 'Execution',
+    example: 'Running the covered strangle on WDC: 515 calls and 435 puts. Collecting $6,300 while the crowd argues about the Fed.',
+  },
+  {
+    term: 'GEX Wall',
+    translation: 'Market maker gamma exposure concentration strike.',
+    tradingContext: 'Key price level where dealers must aggressively hedge shares, creating a mechanical magnet or trampoline for price.',
+    category: 'Technical',
+    example: 'CLS bounced cleanly off the 360 GEX Put Wall because dealers were forced to buy shares.',
+  },
 ]
 
 interface UnkOracleModalProps {

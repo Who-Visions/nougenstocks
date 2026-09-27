@@ -3,6 +3,8 @@ import {
   calculatePositionSize,
   computeCushionStatus,
   evaluateUnkScore,
+  calculateVolatilityCashBuffer,
+  calculateOptionsWheelPlan,
   type TradeLogEntry,
 } from '../unkEngine'
 
@@ -171,4 +173,44 @@ describe('Unk Trading Engine (unkEngine)', () => {
       expect(status.circuitBreakerReason).toContain('Consecutive Loss Limit Hit')
     })
   })
+
+  describe('calculateVolatilityCashBuffer', () => {
+    it('enforces 30% cash buffer in low VIX complacency regime (<15)', () => {
+      const alloc = calculateVolatilityCashBuffer(14.1)
+      expect(alloc.regime).toBe('COMPLACENCY')
+      expect(alloc.targetCashPct).toBe(30)
+      expect(alloc.targetEquityPct).toBe(70)
+      expect(alloc.statusBadge).toBe('WARNING')
+      expect(alloc.tacticalAction).toContain('Cash-Secured Puts')
+    })
+
+    it('recommends standard 80/20 in normal VIX regime (15-22)', () => {
+      const alloc = calculateVolatilityCashBuffer(18.5)
+      expect(alloc.regime).toBe('NORMAL')
+      expect(alloc.targetCashPct).toBe(20)
+      expect(alloc.targetEquityPct).toBe(80)
+    })
+
+    it('triggers panic capital deployment zone at extreme VIX (>30)', () => {
+      const alloc = calculateVolatilityCashBuffer(35)
+      expect(alloc.regime).toBe('PANIC')
+      expect(alloc.targetCashPct).toBe(5)
+      expect(alloc.targetEquityPct).toBe(95)
+      expect(alloc.statusBadge).toBe('BULLISH')
+    })
+  })
+
+  describe('calculateOptionsWheelPlan', () => {
+    it('computes cash secured put strikes and net discount basis correctly', () => {
+      const plan = calculateOptionsWheelPlan('GOOGL', 340, 52)
+      expect(plan.symbol).toBe('GOOGL')
+      expect(plan.cspStrike).toBeLessThan(340)
+      expect(plan.estimatedPremium).toBeGreaterThan(0)
+      expect(plan.netEffectiveCostBasis).toBe(plan.cspStrike - plan.estimatedPremium)
+      expect(plan.discountFromMarketPct).toBeGreaterThan(0)
+      expect(plan.coveredCallStrike).toBeGreaterThan(340)
+      expect(plan.strangleMonthlyIncome).toBeGreaterThan(plan.estimatedPremium)
+    })
+  })
 })
+

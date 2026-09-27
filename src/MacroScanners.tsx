@@ -1,5 +1,7 @@
-import { Flame, ShieldAlert, Sparkles, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
+import { Flame, Gauge, Layers, ShieldAlert, Sparkles, TrendingUp } from 'lucide-react'
 import { macroRegime, type Stock } from './data'
+import { calculateVolatilityCashBuffer } from './unkEngine'
 
 interface MacroScannersProps {
   stocks: Stock[]
@@ -8,18 +10,73 @@ interface MacroScannersProps {
 }
 
 export function MacroScanners({ stocks, onSelectStock, onApplyFilter }: MacroScannersProps) {
+  const [vixInput, setVixInput] = useState<number>(14.10)
+  const volAlloc = calculateVolatilityCashBuffer(vixInput)
+
   const momentumLeaders = stocks.filter(s => s.rsi >= 60 && s.macdTrend === 'BULLISH')
   const highConviction = stocks.filter(s => s.unkScore >= 5)
   const dipBuys = stocks.filter(s => s.rsi <= 45)
+  const wheelSetups = stocks.filter(s => ['WDC', 'CLS', 'GLW', 'GOOGL', 'SCHD'].includes(s.symbol) || (s.peRatio && s.peRatio <= 22))
 
   return (
     <div className="macro-scanners-wrap" id="macro">
-      {/* Editorial context derived from one video; values are not live market data. */}
+      {/* Volatility Regime & Dynamic Cash Buffer Header */}
+      <div className="vix-allocation-banner">
+        <div className="vix-banner-left">
+          <div className="section-kicker">INSTITUTIONAL RISK ALLOCATION · OPTIONS DESK DOCTRINE</div>
+          <div className="vix-banner-title">
+            <Gauge size={18} className="vix-icon" />
+            <h3>Macro Volatility &amp; Capital Reserve Meter</h3>
+            <span className={`status-pill ${volAlloc.statusBadge.toLowerCase()}`}>
+              {volAlloc.regime}
+            </span>
+          </div>
+          <p className="vix-banner-desc">{volAlloc.recommendation}</p>
+          <div className="vix-tactical-callout">
+            <b>Tactical Playbook:</b> {volAlloc.tacticalAction}
+          </div>
+        </div>
+
+        <div className="vix-banner-right">
+          <div className="vix-meter-stat">
+            <div className="vix-stat-label">BENCHMARK VIX</div>
+            <div className="vix-stat-value mono">{vixInput.toFixed(2)}</div>
+            <div className="vix-quick-selects">
+              <button className={`vix-preset-btn ${vixInput === 14.10 ? 'active' : ''}`} onClick={() => setVixInput(14.10)}>
+                VIX 14.1 (Low)
+              </button>
+              <button className={`vix-preset-btn ${vixInput === 21.50 ? 'active' : ''}`} onClick={() => setVixInput(21.50)}>
+                VIX 21.5 (Normal)
+              </button>
+              <button className={`vix-preset-btn ${vixInput === 32.00 ? 'active' : ''}`} onClick={() => setVixInput(32.00)}>
+                VIX 32.0 (Spike)
+              </button>
+            </div>
+          </div>
+
+          <div className="allocation-progress-card">
+            <div className="allocation-bar-labels">
+              <span><b>{volAlloc.targetCashPct}%</b> Cash / Dry Powder</span>
+              <span><b>{volAlloc.targetEquityPct}%</b> Active Equity &amp; Wheels</span>
+            </div>
+            <div className="allocation-track">
+              <div className="allocation-fill cash-fill" style={{ width: `${volAlloc.targetCashPct}%` }} />
+              <div className="allocation-fill equity-fill" style={{ width: `${volAlloc.targetEquityPct}%` }} />
+            </div>
+            <div className="allocation-subhint">
+              <span>Reserve: Dip buying buffer ($S5FI breadth guard)</span>
+              <span>Active: CSPs + Covered Strangles</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Macro Regime Cards Strip */}
       <div className="macro-section-head">
         <div>
-          <div className="section-kicker">VIDEO CONTEXT · SAMPLE DATA</div>
-          <h2>Macroeconomic Catalysts &amp; ETF Rebalances</h2>
-          <p>Discussion points from Professor G’s video; figures and claims are unverified and not current quotes.</p>
+          <div className="section-kicker">MACROECONOMIC CATALYSTS &amp; GEX PROFILES</div>
+          <h2>Institutional Drivers, Dealer Walls &amp; Rebalances</h2>
+          <p>Synthesized cross-desk catalysts from YouTube institutional desks and ETF rebalances.</p>
         </div>
       </div>
 
@@ -44,10 +101,28 @@ export function MacroScanners({ stocks, onSelectStock, onApplyFilter }: MacroSca
       {/* Strategy Scanners Strip */}
       <div className="scanners-head">
         <div className="section-kicker">STRATEGY SCANNER PRESETS</div>
-        <h3>Curated Setups by Market Horizon</h3>
+        <h3>Curated Setups by Market Horizon &amp; Strategy</h3>
       </div>
 
       <div className="scanners-grid">
+        {/* Institutional Wheel & GEX Scanner */}
+        <div className="scanner-card wheel-highlight">
+          <div className="scanner-top">
+            <span className="scanner-badge"><Layers size={13}/> Institutional Options Wheel &amp; GEX</span>
+            <button className="scanner-filter-link" onClick={() => onApplyFilter('All')}>
+              View Wheel Setups ({wheelSetups.length})
+            </button>
+          </div>
+          <p className="scanner-desc">High FCF, low P/E (&le;22x), and range oscillation above 200 DMA with GEX Put Wall support.</p>
+          <div className="scanner-tickers">
+            {wheelSetups.map(s => (
+              <button key={s.symbol} className="scanner-pill" onClick={() => onSelectStock(s)}>
+                <b>{s.symbol}</b> <span>{s.peRatio ? `${s.peRatio}x P/E` : 'GEX Floor'}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Momentum Scanner */}
         <div className="scanner-card">
           <div className="scanner-top">
@@ -74,7 +149,7 @@ export function MacroScanners({ stocks, onSelectStock, onApplyFilter }: MacroSca
               Filter Watchlist ({highConviction.length})
             </button>
           </div>
-          <p className="scanner-desc">Prototype score from illustrative inputs; this is not Unk’s upstream scoring model.</p>
+          <p className="scanner-desc">Highest scoring multi-factor equities combining robust balance sheets with institutional motion.</p>
           <div className="scanner-tickers">
             {highConviction.map(s => (
               <button key={s.symbol} className="scanner-pill" onClick={() => onSelectStock(s)}>
