@@ -136,41 +136,79 @@
   --glow-accent-strong: rgba(16, 185, 129, 0.6);
 }
 :root[data-theme="light"] {
-  --surface-ground: #f6f8f3;
-  --surface-sidebar: #eef1eb;
+  /* Pure White & Silver Ground */
+  --surface-ground: #ffffff;
+  --surface-sidebar: #f8fafc;
   --surface-panel: #ffffff;
-  --surface-raised: #f3f5f0;
-  --surface-hover: #e8ece4;
-  --surface-selected: #e7efdf;
-  --surface-inset: #f7f8f5;
-  --border-subtle: #d8ded3;
-  --border-default: #c1c9bc;
-  --border-strong: #98a395;
-  --ink-primary: #182017;
-  --ink-bright: #10160f;
-  --ink-secondary: #3f4a3d;
-  --ink-muted: #586354;
-  --ink-faint: #697366;
-  --accent: #527b20;
-  --accent-soft: #375519;
-  --accent-muted: #546843;
-  --accent-outline: #859b70;
-  --positive: #3d741a;
-  --negative: #a43835;
-  --negative-soft: #9a4f4c;
-  --chart-blue: #41649e;
-  --chart-blue-soft: #5876a5;
-  --chart-purple: #785391;
-  --chart-orange: #925a1e;
-  --chart-yellow: #806214;
+  --surface-raised: #f1f5f9;
+  --surface-hover: #e2e8f0;
+  --surface-selected: #e2e8f0;
+  --surface-inset: #f8fafc;
+
+  /* Metallic Silver & Slate Borders */
+  --border-subtle: #f1f5f9;
+  --border-default: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-silver: #94a3b8;
+
+  /* Jet-Black & Slate Typography */
+  --ink-bright: #000000;
+  --ink-primary: #0f172a;
+  --ink-secondary: #334155;
+  --ink-muted: #64748b;
+  --ink-faint: #94a3b8;
+  --silver-bright: #334155;
+  --silver: #64748b;
+  --silver-dark: #94a3b8;
+
+  /* Royal Gold (High Contrast on White) */
+  --gold: #b45309;
+  --gold-bright: #d97706;
+  --gold-soft: #fef3c7;
+  --gold-dark: #78350f;
+  --gold-bg: rgba(217, 119, 6, 0.1);
+  --gold-border: rgba(217, 119, 6, 0.35);
+  --gold-glow: rgba(217, 119, 6, 0.25);
+
+  /* Performance Emerald Green */
+  --green: #059669;
+  --green-bright: #10b981;
+  --green-soft: #d1fae5;
+  --green-dark: #064e3b;
+  --green-bg: rgba(5, 150, 105, 0.1);
+  --green-border: rgba(5, 150, 105, 0.3);
+  --green-glow: rgba(5, 150, 105, 0.2);
+
+  /* Functional Roles */
+  --accent: var(--green);
+  --accent-soft: var(--green-bright);
+  --positive: var(--green);
+  --negative: #e11d48;
+  --negative-soft: #fda4af;
+  --chart-blue: #2563eb;
+  --chart-blue-soft: #60a5fa;
+  --chart-purple: #9333ea;
+  --chart-orange: var(--gold);
+  --chart-yellow: var(--gold-bright);
   --neutral-black: #000000;
   --neutral-white: #ffffff;
-  --overlay-backdrop: #03050799;
-  --shadow-card: #18201710;
-  --shadow-overlay: #18201735;
-  --glow-accent-soft: #527b2010;
-  --glow-accent-medium: #527b2020;
-  --glow-accent-strong: #527b2040;
+  --overlay-backdrop: rgba(15, 23, 42, 0.5);
+  --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --shadow-overlay: 0 20px 60px rgba(15, 23, 42, 0.15);
+  --glow-accent-soft: var(--green-bg);
+  --glow-accent-medium: var(--green-glow);
+  --glow-accent-strong: rgba(5, 150, 105, 0.4);
+
+  --bg: var(--surface-ground);
+  --panel: var(--surface-panel);
+  --panel-soft: var(--surface-raised);
+  --line: var(--border-default);
+  --muted: var(--ink-muted);
+  --text: var(--ink-primary);
+  --lime: var(--green);
+  --red: var(--negative);
+  --surface: var(--surface-panel);
+  --ink: var(--ink-primary);
 }
 :root[data-theme="light"] *,
 :root[data-theme="dark"] * { color-scheme: inherit; }
@@ -190,40 +228,67 @@
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-  --surface-ground: #f6f8f3;
-  --surface-sidebar: #eef1eb;
+  --surface-ground: #ffffff;
+  --surface-sidebar: #f8fafc;
   --surface-panel: #ffffff;
-  --surface-raised: #f3f5f0;
-  --surface-hover: #e8ece4;
-  --surface-selected: #e7efdf;
-  --surface-inset: #f7f8f5;
-  --border-subtle: #d8ded3;
-  --border-default: #c1c9bc;
-  --border-strong: #98a395;
-  --ink-primary: #182017;
-  --ink-bright: #10160f;
-  --ink-secondary: #3f4a3d;
-  --ink-muted: #586354;
-  --ink-faint: #697366;
-  --accent: #527b20;
-  --accent-soft: #375519;
-  --accent-muted: #546843;
-  --accent-outline: #859b70;
-  --positive: #3d741a;
-  --negative: #a43835;
-  --negative-soft: #9a4f4c;
-  --chart-blue: #41649e;
-  --chart-blue-soft: #5876a5;
-  --chart-purple: #785391;
-  --chart-orange: #925a1e;
-  --chart-yellow: #806214;
+  --surface-raised: #f1f5f9;
+  --surface-hover: #e2e8f0;
+  --surface-selected: #e2e8f0;
+  --surface-inset: #f8fafc;
+  --border-subtle: #f1f5f9;
+  --border-default: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-silver: #94a3b8;
+  --ink-bright: #000000;
+  --ink-primary: #0f172a;
+  --ink-secondary: #334155;
+  --ink-muted: #64748b;
+  --ink-faint: #94a3b8;
+  --silver-bright: #334155;
+  --silver: #64748b;
+  --silver-dark: #94a3b8;
+  --gold: #b45309;
+  --gold-bright: #d97706;
+  --gold-soft: #fef3c7;
+  --gold-dark: #78350f;
+  --gold-bg: rgba(217, 119, 6, 0.1);
+  --gold-border: rgba(217, 119, 6, 0.35);
+  --gold-glow: rgba(217, 119, 6, 0.25);
+  --green: #059669;
+  --green-bright: #10b981;
+  --green-soft: #d1fae5;
+  --green-dark: #064e3b;
+  --green-bg: rgba(5, 150, 105, 0.1);
+  --green-border: rgba(5, 150, 105, 0.3);
+  --green-glow: rgba(5, 150, 105, 0.2);
+  --accent: var(--green);
+  --accent-soft: var(--green-bright);
+  --positive: var(--green);
+  --negative: #e11d48;
+  --negative-soft: #fda4af;
+  --chart-blue: #2563eb;
+  --chart-blue-soft: #60a5fa;
+  --chart-purple: #9333ea;
+  --chart-orange: var(--gold);
+  --chart-yellow: var(--gold-bright);
   --neutral-black: #000000;
   --neutral-white: #ffffff;
-  --overlay-backdrop: #03050799;
-  --shadow-card: #18201710;
-  --shadow-overlay: #18201735;
-  --glow-accent-soft: #527b2010;
-  --glow-accent-medium: #527b2020;
-  --glow-accent-strong: #527b2040;
+  --overlay-backdrop: rgba(15, 23, 42, 0.5);
+  --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --shadow-overlay: 0 20px 60px rgba(15, 23, 42, 0.15);
+  --glow-accent-soft: var(--green-bg);
+  --glow-accent-medium: var(--green-glow);
+  --glow-accent-strong: rgba(5, 150, 105, 0.4);
+  --bg: var(--surface-ground);
+  --panel: var(--surface-panel);
+  --panel-soft: var(--surface-raised);
+  --line: var(--border-default);
+  --muted: var(--ink-muted);
+  --text: var(--ink-primary);
+  --lime: var(--green);
+  --red: var(--negative);
+  --surface: var(--surface-panel);
+  --ink: var(--ink-primary);
   }
 }
+

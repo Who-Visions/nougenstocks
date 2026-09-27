@@ -22,6 +22,8 @@ import {
   Settings2,
   ShieldAlert,
   Star,
+  Sun,
+  Moon,
   Zap,
 } from 'lucide-react'
 import { chartSeries, defaultWatchlist, indices, stocks, type Stock } from './data'
@@ -134,6 +136,24 @@ function App() {
   const [addQuery, setAddQuery] = useState('')
   const [sort, setSort] = useState<{ key: SortKey; direction: 'asc' | 'desc' }>({ key: 'unkScore', direction: 'desc' })
   const [now, setNow] = useState(() => new Date())
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    try {
+      const saved = localStorage.getItem('nougenstocks.theme.v1')
+      if (saved === 'light' || saved === 'dark') return saved
+    } catch {}
+    return 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      localStorage.setItem('nougenstocks.theme.v1', theme)
+    } catch {}
+  }, [theme])
+
+  const toggleTheme = () => {
+    setTheme(curr => (curr === 'dark' ? 'light' : 'dark'))
+  }
 
   // Always Live Market Feed State (Defaults to true, powered by Yahoo Finance free proxy)
   const [isLiveMarket, setIsLiveMarket] = useState<boolean>(() => {
@@ -499,6 +519,15 @@ function App() {
                 </button>
               )}
             </div>
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'dark' ? 'Light mode (white background)' : 'Dark mode (pitch black)'}`}
+              aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+            >
+              {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
+              <span>{theme === 'dark' ? 'LIGHT' : 'DARK'}</span>
+            </button>
             <div className="market-open" title="Clock uses weekday session hours; exchange holidays are not included">
               <span className="pulse-dot" /> {clock.session === 'WEEKDAY SESSION HOURS' ? 'REGULAR HOURS' : 'OUTSIDE REGULAR HOURS'} <span className="market-time">· {clock.time}</span>
             </div>

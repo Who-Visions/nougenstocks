@@ -333,3 +333,129 @@
 .live-quote-callout b {
   color: #ffffff;
 }
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  color: var(--ink-secondary);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font: 700 9px 'DM Mono', monospace;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--gold);
+  color: var(--ink-bright);
+}
+
+/* Light Mode Overrides for High Contrast Wall Street Look */
+:root[data-theme="light"] body {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .sidebar {
+  background: #f8fafc;
+  border-right-color: #e2e8f0;
+}
+
+:root[data-theme="light"] .brand-type {
+  color: #000000;
+}
+
+:root[data-theme="light"] .topbar {
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom-color: #e2e8f0;
+}
+
+:root[data-theme="light"] .crumb b,
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] .index-value,
+:root[data-theme="light"] .chart-summary strong,
+:root[data-theme="light"] .company-cell b,
+:root[data-theme="light"] .table-foot b {
+  color: #000000;
+}
+
+:root[data-theme="light"] .market-card,
+:root[data-theme="light"] .stocks-section,
+:root[data-theme="light"] .journal-container,
+:root[data-theme="light"] .macro-scanners-wrap,
+:root[data-theme="light"] .planner-card,
+:root[data-theme="light"] .calc-preview-card,
+:root[data-theme="light"] .log-entry-form,
+:root[data-theme="light"] .journal-summary-card,
+:root[data-theme="light"] .scanner-metric-card,
+:root[data-theme="light"] .scanner-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+}
+
+:root[data-theme="light"] .index-card {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+:root[data-theme="light"] .search-box,
+:root[data-theme="light"] .filter-button,
+:root[data-theme="light"] .range-tabs {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+:root[data-theme="light"] .search-box input {
+  color: #000000;
+}
+
+:root[data-theme="light"] .search-box input::placeholder {
+  color: #94a3b8;
+}
+
+:root[data-theme="light"] .live-toggle-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+:root[data-theme="light"] .live-toggle-btn.active {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+:root[data-theme="light"] tbody tr {
+  border-top-color: #f1f5f9;
+}
+
+:root[data-theme="light"] tbody tr:hover {
+  background: #f8fafc;
+}
+
+:root[data-theme="light"] .range-tabs button.selected {
+  background: #ffffff;
+  color: #000000;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme="light"] .live-quote-callout {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+:root[data-theme="light"] .live-quote-callout b {
+  color: #042f2e;
+}
+
