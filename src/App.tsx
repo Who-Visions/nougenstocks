@@ -21,6 +21,7 @@ import {
   Search,
   Settings2,
   ShieldAlert,
+  Sparkles,
   Star,
   Sun,
   Moon,
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react'
 import { chartSeries, defaultWatchlist, indices, stocks, type Stock } from './data'
 import { StockDetailModal } from './StockDetailModal'
+import { UnkOracleModal } from './UnkOracleModal'
 import { TradingJournal } from './TradingJournal'
 import { MacroScanners } from './MacroScanners'
 import { fetchLiveQuote, type LiveQuote } from './marketApi'
@@ -170,6 +172,7 @@ function App() {
 
   // Modal Detail State
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
+  const [oracleOpen, setOracleOpen] = useState(false)
 
   // Journal State
   const [trades, setTrades] = useState<TradeLogEntry[]>(readJournal)
@@ -404,6 +407,14 @@ function App() {
         setAddOpen(false)
         setAddQuery('')
         setSelectedStock(null)
+        setOracleOpen(false)
+      }
+      if (
+        (event.key.toLowerCase() === 'o' || event.key.toLowerCase() === 'u') &&
+        !['INPUT', 'TEXTAREA'].includes((event.target as HTMLElement)?.tagName)
+      ) {
+        event.preventDefault()
+        setOracleOpen(prev => !prev)
       }
     }
     window.addEventListener('keydown', onKeyDown)
@@ -527,6 +538,15 @@ function App() {
             >
               {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
               <span>{theme === 'dark' ? 'LIGHT' : 'DARK'}</span>
+            </button>
+            <button
+              className="oracle-btn"
+              onClick={() => setOracleOpen(true)}
+              title="Open Unk Tape Decoder & Market Oracle (Hotkeys: O or U)"
+              aria-label="Open Unk Market Oracle"
+            >
+              <Sparkles size={13} />
+              <span>UNK ORACLE</span>
             </button>
             <div className="market-open" title="Clock uses weekday session hours; exchange holidays are not included">
               <span className="pulse-dot" /> {clock.session === 'WEEKDAY SESSION HOURS' ? 'REGULAR HOURS' : 'OUTSIDE REGULAR HOURS'} <span className="market-time">· {clock.time}</span>
@@ -937,6 +957,24 @@ function App() {
         onClose={() => setSelectedStock(null)}
         onLoadIntoPlanner={s => loadStockIntoPlanner(s)}
       />
+
+      {/* Unk Tape Decoder & Market Oracle Modal */}
+      {oracleOpen && (
+        <UnkOracleModal
+          stocks={displayStocks}
+          activeStock={displayStocks.find(s => s.symbol === activeTicker) || null}
+          onSelectStock={s => {
+            setActiveTicker(s.symbol)
+            const livePrice = (isLiveMarket && liveQuotes[s.symbol]) ? liveQuotes[s.symbol].price : s.price
+            setEntryPrice(livePrice.toFixed(2))
+            const defStop = livePrice * (1 - (TRADE_MODES[tradeMode].riskPct / 100))
+            setStopPrice(defStop.toFixed(2))
+            setSetupGrade(s.setupQuality)
+          }}
+          onLoadPlanner={s => loadStockIntoPlanner(s)}
+          onClose={() => setOracleOpen(false)}
+        />
+      )}
 
       {/* Manage Watchlist Modal */}
       {addOpen && (
