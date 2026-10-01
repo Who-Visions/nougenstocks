@@ -18,3 +18,16 @@ npm run build
 ## Data and security
 
 The starter does not present sample prices as live market data. Connect a server-side quote adapter before enabling live status. Keep provider credentials on the server; do not put secret keys in `VITE_*` variables.
+
+<!-- nougen:fleet-role:begin (generated from nougen-handoffs fleet/manifest.json; edit the manifest, not this block) -->
+## Fleet role
+
+| | |
+|---|---|
+| Role | market dashboard |
+| Kind | satellite |
+| Status | canonical |
+| Canonical for | stocks |
+| Visibility | public |
+
+<!-- nougen:fleet-role:end -->
