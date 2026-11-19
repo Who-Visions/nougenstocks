@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Who-Visions/NouGenShards/main/schemas/readme-manifest.schema.json",
+  "schema_version": 1,
+  "project": {
+    "title": "NouGenStocks",
+    "description": "A clean, fast market dashboard starter. The current UI uses clearly labeled sample data and is ready for a quote provider and backend integration.",
+    "emoji": "📈"
+  },
+  "table_of_contents": true,
+  "sections": [
+    {
+      "title": "Run locally",
+      "content": "```sh\nnpm install\nnpm run dev\n```",
+      "emoji": "🚀"
+    },
+    {
+      "title": "Build",
+      "content": "```sh\nnpm run build\n```",
+      "emoji": "🔧"
+    },
+    {
+      "title": "Data and security",
+      "content": "The starter does not present sample prices as live market data. Connect a server-side quote adapter before enabling live status. Keep provider credentials on the server; do not put secret keys in `VITE_*` variables.",
+      "emoji": "🔒"
+    },
+    {
+      "title": "Fleet role",
+      "content": "| | |\n|---|---|\n| Role | market dashboard |\n| Kind | satellite |\n| Status | canonical |\n| Canonical for | stocks |\n| Visibility | public |\n\nThis role table is generated from the NouGenRelay fleet manifest; the fleet manifest stays the source of truth for it.",
+      "emoji": "none"
+    }
+  ],
+  "links": [
+    {
+      "label": "Source Repository",
+      "url": "https://github.com/Who-Visions/nougenstocks"
+    }
+  ]
+}
